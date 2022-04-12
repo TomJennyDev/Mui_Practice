@@ -1,24 +1,51 @@
-import logo from './logo.svg';
-import './App.css';
+import { Container } from "@mui/material";
+import CssBaseline from "@mui/material/CssBaseline";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { createContext, useMemo, useState } from "react";
+import MainContent from "./components/MainContent";
+import NavBar from "./components/NavBar";
+import jobs from "./data.json";
+
+export const ColorModeContext = createContext({ toggleColorMode: () => {} });
+
+const getDesignTokens = (mode) => ({
+  palette: {
+    mode,
+    ...(mode === "dark" && {
+      primary: {
+        main: "#f50057",
+      },
+      // secondary: {
+      //   main: "#f50057",
+      // },
+    }),
+  },
+});
 
 function App() {
+  const [mode, setMode] = useState("light");
+
+  const colorMode = useMemo(
+    () => ({
+      toggleColorMode: () => {
+        setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+      },
+    }),
+    []
+  );
+
+  const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <NavBar />
+        <Container maxWidth="lg" sx={{ mt: 5 }}>
+          <MainContent jobs={jobs} />
+        </Container>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
 
